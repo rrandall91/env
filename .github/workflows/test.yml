@@ -1,0 +1,34 @@
+on:
+  push:
+  pull_request:
+name: Test
+jobs:
+  build:
+    strategy:
+      matrix:
+        go-version: [1.14.x, 1.16.x, 1.17.x, 1.18.x, 1.19.x]
+        platform: [ubuntu-latest]
+    runs-on: ${{ matrix.platform }}
+    steps:
+    - name: Install Go
+      uses: actions/setup-go@v3
+      with:
+        go-version: ${{ matrix.go-version }}
+    - name: Setup Golang caches
+      uses: actions/cache@v3
+      with:
+        path: |
+          ~/go/pkg/mod
+        key: ${{ runner.os }}-go-${{ matrix.go-version }}-${{ hashFiles('**/go.sum') }}
+        restore-keys: |
+          ${{ runner.os }}-go-${{ matrix.go-version }}
+    - name: Fetch Repository
+      uses: actions/checkout@v3
+    - name: Run Tests
+      run: go test -coverprofile=c.out -v ./...
+    - name: Publish Coverage
+      uses: paambaati/codeclimate-action@v3.0.0
+      env:
+        CC_TEST_REPORTER_ID: af39397a640bc6cb7856c472ae8567c661998feb541ae3c54dd0716296bd3351
+      with:
+        prefix: github.com/rrandall91/env
