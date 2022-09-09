@@ -5,7 +5,12 @@ import (
 )
 
 // Get returns the value of the environment variable named by the key or the fallback value if the variable is not set.
-func Get(key string, fallback string) string {
+func Get(key string) string {
+	return os.Getenv(key)
+}
+
+// GetWithDefault returns the value of the environment variable named by the key or the default value if the variable is not set.
+func GetWithDefault(key string, fallback string) string {
 	if value, ok := os.LookupEnv(key); ok && value != "" {
 		return value
 	}

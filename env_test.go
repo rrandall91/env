@@ -37,6 +37,34 @@ func TestSet(t *testing.T) {
 
 func TestGet(t *testing.T) {
 	type args struct {
+		key   string
+		value string
+	}
+
+	tests := []struct {
+		name string
+		args args
+	}{
+		{
+			name: "Returns the value of the environment variable named by the key",
+			args: args{
+				key:   "TEST_KEY",
+				value: "TEST_VALUE",
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := Get(tt.args.key); got != tt.args.value {
+				t.Errorf("Get() = %v, want %v", got, tt.args.value)
+			}
+		})
+	}
+}
+
+func TestGetWithDefault(t *testing.T) {
+	type args struct {
 		key      string
 		value    string
 		fallback string
@@ -74,7 +102,7 @@ func TestGet(t *testing.T) {
 		}
 
 		t.Run(tt.name, func(t *testing.T) {
-			if got := Get(tt.args.key, tt.args.fallback); got != tt.want {
+			if got := GetWithDefault(tt.args.key, tt.args.fallback); got != tt.want {
 				t.Errorf("Get() = %v, want %v", got, tt.args.fallback)
 			}
 		})
@@ -83,7 +111,13 @@ func TestGet(t *testing.T) {
 
 func BenchmarkGet(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		Get("TEST_KEY", "TEST_FALLBACK")
+		Get("TEST_KEY")
+	}
+}
+
+func BenchmarkGetWithDefault(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		GetWithDefault("TEST_KEY", "TEST_FALLBACK")
 	}
 }
 
